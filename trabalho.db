@@ -1,0 +1,389 @@
+CREATE TABLE Cargo(
+	codigo int not null,
+	nome varchar(20) not null,
+	primary key (codigo)
+);
+
+CREATE TABLE Empregado(
+	codigo int identity,
+	nome varchar(45) not null,
+	sexo char(1) default 'F',
+	RG int unique not null,
+	CPF int unique not null,
+	datanasc smalldatetime not null,
+	codcargo int,
+	telefone varchar(10),
+	dataatualizacao smalldatetime default getdate(),
+	primary key (codigo),
+	foreign key (codcargo) references Cargo on delete set null on update cascade,
+	check (sexo in ('F', 'M'))
+);
+
+
+DROP TABLE Empregado;
+
+ALTER TABLE Cargo ADD sigla char(5);
+
+ALTER TABLE Cargo ALTER COLUMN sigla varchar(5);
+
+ALTER TABLE Cargo DROP COLUMN sigla
+
+ALTER TABLE Cargo ADD sing char(1);
+
+ALTER TABLE Cargo ADD CONSTRAINT simbolo check(sing in ('A', 'B', 'C'));
+
+ALTER TABLE Cargo DROP CONSTRAINT simbolo;
+
+
+CREATE TABLE Funcao(
+	codigo int not null,
+	nome varchar(20) not null
+);
+
+
+ALTER TABLE Funcao ADD CONSTRAINT pk_codigo PRIMARY KEY(codigo);
+
+ALTER TABLE Empregado ADD codfuncao int;
+
+ALTER TABLE Empregado ADD CONSTRAINT pk_codfuncao FOREIGN KEY(codfuncao) REFERENCES Funcao (codigo); 
+
+INSERT INTO Cargo (codigo, nome, sing) VALUES 
+(1, 'NOME1', 'F')
+
+INSERT INTO Funcao (codigo, nome) VALUES 
+(2, 'NOME2')
+INSERT INTO Funcao (codigo, nome) VALUES 
+(3, 'NOME3')
+INSERT INTO Funcao (codigo, nome) VALUES 
+(4, 'FLAVIA')
+INSERT INTO Funcao (codigo, nome) VALUES 
+(5, 'BRUNO')
+INSERT INTO Funcao (codigo, nome) VALUES 
+(1, 'NOME11')
+INSERT INTO Funcao (codigo, nome) VALUES 
+(6, 'NOME22')
+INSERT INTO Funcao (codigo, nome) VALUES 
+(7, 'NOME33')
+INSERT INTO Funcao (codigo, nome) VALUES 
+(8, 'FLAVIA1')
+INSERT INTO Funcao (codigo, nome) VALUES 
+(9, 'BRUNO1');
+
+INSERT INTO Empregado (nome, sexo, RG, CPF, datanasc, codcargo, telefone) VALUES 
+('NOME11', 'F', 1234, 6543, 12/02/2345, 1,'876545')
+INSERT INTO Empregado (nome, sexo, RG, CPF, datanasc, codcargo, telefone) VALUES 
+('NOME22', 'M', 12394, 6423, 12/02/1423, 2, '5822')
+INSERT INTO Empregado (nome, sexo, RG, CPF, datanasc, codcargo, telefone) VALUES 
+('NOME11', 'F', 13234, 65432, 12/02/2345, 1,'87654514')
+INSERT INTO Empregado (nome, sexo, RG, CPF, datanasc, codcargo, telefone) VALUES 
+('NOME11', 'M', 15234, 65433, 12/02/2345, 1,'87654514')
+
+DELETE FROM Cargo
+WHERE codigo = 1;
+
+SELECT * FROM Cargo;
+SELECT * FROM Funcao;
+SELECT * FROM Empregado;
+SELECT * FROM EmpregadoNovo;
+
+CREATE TABLE EmpregadoNovo(
+	codigoEmpregado int identity,
+	nome varchar(45) not null,
+	sexo char(1) default 'F',
+	RG int unique not null,
+	CPF int unique not null,
+	datanasc date not null,
+	codcargo int,
+	telefone varchar(10),
+	dataatualizacao smalldatetime default getdate(),
+	primary key (codigoEmpregado),
+	foreign key (codcargo) references Cargo on delete set null on update cascade,
+	check (sexo in ('F', 'M'))
+);
+
+UPDATE Cargo
+SET codigo = 20
+WHERE codigo = 2;
+
+
+SELECT nome FROM Empregado WHERE RG = 1234 AND codcargo = NULL;
+
+SELECT nome FROM Empregado WHERE RG = 1234 OR codcargo = NULL;
+
+SELECT * FROM Empregado
+WHERE codcargo is NULL
+ORDER BY nome
+
+SELECT codcargo, nome FROM Empregado
+ORDER BY codcargo, nome
+
+INSERT INTO Empregado (nome, sexo, RG, CPF, datanasc, telefone) VALUES 
+('NOME111', 'F', 234, 65423, 12/02/2345, '8761545')
+INSERT INTO Empregado (nome, sexo, RG, CPF, datanasc, telefone) VALUES 
+('NOME222', 'M', 1294, 64233, 12/02/1423, '58122')
+INSERT INTO Empregado (nome, sexo, RG, CPF, datanasc, telefone) VALUES 
+('NOME114', 'F', 1334, 654322, 12/02/2345,'871654514')
+INSERT INTO Empregado (nome, sexo, RG, CPF, datanasc, telefone) VALUES 
+('NOME115', 'M', 12394, 654333, 12/02/2345, '817654514')
+
+--=============================== aula 17/09/2024 ============================================
+
+INSERT INTO Cargo (codigo, nome, sing) VALUES 
+(1, 'RECEPÇÃO', 'F')
+INSERT INTO Cargo (codigo, nome, sing) VALUES 
+(2, 'RECEPÇÃO', 'F')
+INSERT INTO Cargo (codigo, nome, sing) VALUES 
+(3, 'LIMPEZA', 'M')
+INSERT INTO Cargo (codigo, nome, sing) VALUES 
+(4, 'LIMPEZA', 'F')
+INSERT INTO Cargo (codigo, nome, sing) VALUES 
+(5, 'SUPORTE TI', 'M')
+
+-- Povoando tabela Funcao:
+
+INSERT INTO Funcao (codigo, nome) VALUES 
+(1, 'RECEPÇÃO')
+INSERT INTO Funcao (codigo, nome) VALUES 
+(2, 'RECEPÇÃO')
+INSERT INTO Funcao (codigo, nome) VALUES 
+(3, 'LIMPEZA')
+INSERT INTO Funcao (codigo, nome) VALUES 
+(4, 'LIMPEZA')
+INSERT INTO Funcao (codigo, nome) VALUES 
+(5, 'SUPORTE TI')
+
+
+SELECT DISTINCT codcargo FROM Empregado
+
+SELECT DISTINCT codcargo, sexo FROM Empregado
+
+ALTER TABLE EmpregadoNovo ADD salario Money
+
+INSERT INTO EmpregadoNovo (nome, sexo, RG, CPF, datanasc, telefone) SELECT nome, sexo, RG, CPF, datanasc, telefone FROM Empregado 
+
+
+DELETE FROM EmpregadoNovo WHERE x NOT IN
+(SELECT x FROM Empregado)
+
+UPDATE EmpregadoNovo SET codcargo is NULL
+WHERE código IN
+()
+
+UPDATE EmpregadoNovo SET codcargo = 10
+WHERE codcargo is NULL;
+
+SELECT salario AS salario_mensal FROM EmpregadoNovo;
+
+UPDATE EmpregadoNovo SET salario = 1000
+WHERE codcargo = 10;
+
+SELECT salario*12 AS salario_anual FROM EmpregadoNovo;
+
+
+-- LEFT OUTER JOIN
+
+SELECT e.nome AS nome, e.codcargo AS codigo, c.nome AS nome_cargo
+FROM Empregado e LEFT OUTER JOIN Cargo c
+ON e.codcargo = c.codigo
+
+-- RIGHT OUTER JOIN
+
+SELECT e.nome AS nome, e.codcargo AS codigo, c.nome AS nome_cargo
+FROM Empregado e RIGHT OUTER JOIN Cargo c
+ON e.codcargo = c.codigo
+
+-- FULL OUTER JOIN
+
+SELECT e.nome AS nome, e.codcargo AS codigo, c.nome AS nome_cargo
+FROM Empregado e FULL OUTER JOIN Cargo c
+ON e.codcargo = c.codigo
+
+SELECT COUNT(*) FROM Empregado
+SELECT COUNT(DISTINCT sexo) FROM Empregado
+SELECT SUM(salario) FROM EmpregadoNovo
+SELECT MAX(salario) FROM EmpregadoNovo
+SELECT MIN(salario) FROM EmpregadoNovo
+SELECT AVG(salario) FROM EmpregadoNovo
+
+SELECT sexo, AVG(salario) 
+FROM EmpregadoNovo 
+GROUP BY sexo
+
+
+SELECT codcargo, sexo, AVG(salario)
+FROM EmpregadoNovo
+GROUP BY codcargo, sexo
+HAVING codcargo>2
+
+--  não pode usar WHERE como condição de GROUP BY
+
+
+-- Consulta por nomes que tenham a letra O 
+
+SELECT nome FROM Empregado
+WHERE nome LIKE '%O'
+
+
+-- Consulta por nomes que tenham o char 1 na sexta posição
+
+SELECT nome FROM Empregado
+WHERE nome LIKE '_____1%'
+
+
+-- Consulta por nomes com a inicial de B a L
+
+SELECT nome FROM Cargo
+WHERE nome LIKE '[B-L]%'
+
+
+-- Consulta por nomes cuja a inicial não estão no intervalo B a L
+
+SELECT nome FROM Cargo
+WHERE nome LIKE '[^B-L]%'
+
+
+-- Adiciona a coluna logradouro à tabela Empregado
+
+ALTER TABLE Empregado ADD logradouro varchar(20);
+
+ALTER TABLE Empregado ADD complemento varchar(20);
+
+ALTER TABLE Empregado ADD bairro varchar(20);
+
+ALTER TABLE Empregado ADD numero int;
+
+UPDATE Empregado SET numero = 13
+WHERE numero is NULL;
+
+UPDATE Empregado SET logradouro = 'Rua Boa'
+WHERE logradouro is NULL;
+
+UPDATE Empregado SET complemento = 'lote Bela Vista'
+WHERE complemento is NULL;
+
+UPDATE Empregado SET bairro = 'Pontal'
+WHERE bairro is NULL;
+
+
+-- Concatenação de strings
+
+SELECT(logradouro+', ' + complemento+', ' + bairro) AS endereço 
+FROM Empregado
+
+SELECT(logradouro+', ' + complemento+', ' + cast(numero AS varchar(5)) + ', ' + bairro) AS endereço 
+FROM Empregado
+
+SELECT nome, salario
+FROM EmpregadoNovo
+WHERE(salario between 700 and 1000)
+
+--================================== AULA 24/09 ==================================================================
+
+CREATE TABLE CargoUm(
+	codigo int not null,
+	nome varchar(20) not null,
+	primary key (codigo)
+);
+
+ALTER TABLE CargoUm ADD sing char(1);
+
+INSERT INTO CargoUm (codigo, nome, sing) VALUES 
+(1, 'CHEFE', 'M')
+INSERT INTO CargoUm (codigo, nome, sing) VALUES 
+(2, 'CHEFE2', 'M')
+INSERT INTO CargoUm (codigo, nome, sing) VALUES 
+(3, 'CHEFE3', 'M')
+INSERT INTO CargoUm (codigo, nome, sing) VALUES 
+(4, 'CHEFE4', 'M')
+INSERT INTO CargoUm (codigo, nome, sing) VALUES 
+(5, 'RECEPÇÃO', 'F')
+INSERT INTO CargoUm (codigo, nome, sing) VALUES 
+(6, 'RECEPÇÃO', 'F')
+INSERT INTO CargoUm (codigo, nome, sing) VALUES 
+(7, 'LIMPEZA', 'M')
+INSERT INTO CargoUm (codigo, nome, sing) VALUES 
+(8, 'LIMPEZA', 'F')
+INSERT INTO CargoUm (codigo, nome, sing) VALUES 
+(9, 'SUPORTE TI', 'M')
+
+
+SELECT codigo, nome, sing FROM Cargo
+	UNION 
+	(SELECT codigo, nome, sing FROM CargoUm)
+
+
+SELECT codigo, nome, sing FROM Cargo
+	UNION ALL
+	(SELECT codigo, nome, sing FROM CargoUm)
+
+SELECT codigo, nome, sing FROM Cargo
+	INTERSECT
+	(SELECT codigo, nome, sing FROM CargoUm)
+
+INSERT INTO CargoUm (codigo, nome, sing) VALUES 
+(10, 'CHEFE', 'M')
+INSERT INTO CargoUm (codigo, nome, sing) VALUES 
+(25, 'CHEFE2', 'M')
+
+INSERT INTO Cargo (codigo, nome, sing) VALUES 
+(25, 'CHEFE2', 'M')
+
+SELECT codigo, nome, sing FROM Cargo
+	EXCEPT
+	(SELECT codigo, nome, sing FROM CargoUm)
+
+
+SELECT nome, salario 
+FROM EmpregadoNovo
+WHERE codigoEmpregado IN
+(SELECT codigo FROM Empregado);
+
+
+SELECT nome, salario 
+FROM EmpregadoNovo
+WHERE codigoEmpregado NOT IN
+(SELECT codigo FROM Empregado);
+
+
+SELECT N.codigoEmpregado, N.nome, N.salario 
+FROM EmpregadoNovo N
+WHERE EXISTS 
+(SELECT * FROM Empregado E
+WHERE N.codigoEmpregado = E.codigo);
+
+
+SELECT N.codigoEmpregado, N.nome, N.salario 
+FROM EmpregadoNovo N
+WHERE NOT EXISTS 
+(SELECT * FROM Empregado E
+WHERE N.codigoEmpregado = E.codigo);
+
+ALTER TABLE EmpregadoNovo ADD codfuncao int;
+
+ALTER TABLE EmpregadoNovo ADD CONSTRAINT pk_codfuncaoEN FOREIGN KEY(codfuncao) REFERENCES Funcao (codigo);
+
+SELECT codigoEmpregado, nome, salario, codcargo
+FROM EmpregadoNovo
+WHERE salario > ALL
+(SELECT salario FROM EmpregadoNovo WHERE codcargo = 2)
+
+
+SELECT codigoEmpregado, nome, salario, codcargo
+FROM EmpregadoNovo
+WHERE salario > (SELECT AVG(salario) FROM EmpregadoNovo)
+
+
+SELECT N.codigoEmpregado, N.nome, N.salario (SELECT nome FROM Funcao F WHERE N.codfuncao = F.codigo) as Função
+FROM EmpregadoNovo N
+WHERE EXISTS 
+(SELECT * FROM Empregado E
+WHERE N.codigoEmpregado = E.codigo);
+
+CREATE VIEW Empregado_cargo_funcao AS
+SELECT e.codigoEmpregado, e.nome, e.salario, e.salario*12 AS salario_anual, c.codigo AS cod_cargo, c.nome AS nome_cargo, e.codfuncao AS cod_funcao, f.nome AS nome_funcao
+FROM EmpregadoNovo e inner join Cargo c
+ON e.codcargo = c.codigo
+inner join Funcao f
+ON e.codfuncao = f.codigo;
+
+
