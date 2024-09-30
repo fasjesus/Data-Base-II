@@ -231,3 +231,124 @@ WHERE ato_nm_ator IN (SELECT ato_nm_ator FROM ATO_ator_novo);
 SELECT DISTINCT ato_cd_pais_nacionalidade
 FROM ATO_ator;
 
+SELECT A.ato_nm_ator, P.pai_dc_nacionalidade
+FROM ATO_ator A
+INNER JOIN PAI_pais P
+ON A.ato_cd_pais_nacionalidade = P.pai_cd_pais
+ORDER BY A.ato_nm_ator;
+
+SELECT A.ato_nm_ator, P.pai_dc_nacionalidade
+FROM ATO_ator A, PAI_pais P
+WHERE A.ato_cd_pais_nacionalidade = P.pai_cd_pais
+ORDER BY A.ato_nm_ator;
+
+SELECT DISTINCT P.pai_cd_pais AS CODIGO, P.pai_dc_nacionalidade AS NACIONALIDADE
+FROM ATO_ator A
+INNER JOIN PAI_pais P ON A.ato_cd_pais_nacionalidade = P.pai_cd_pais
+ORDER BY P.pai_dc_nacionalidade ASC;
+
+SELECT AVG(cin_cp_lotacao) AS media_lotacao
+FROM CIN_cinema
+WHERE cin_cd_cidade = 1;
+
+SELECT SUM(cin_cp_lotacao) AS total_lotacao
+FROM CIN_cinema
+WHERE cin_cd_cidade = 1;
+
+SELECT cin_nm_fantasia, cin_cp_lotacao
+FROM CIN_cinema
+WHERE cin_cp_lotacao = (SELECT MAX(cin_cp_lotacao) FROM CIN_cinema WHERE cin_cd_cidade = 1)
+AND cin_cd_cidade = 1;
+
+SELECT COUNT(*) AS quantidade_cinemas
+FROM CIN_cinema
+WHERE cin_cd_cidade = 1;
+
+SELECT cin_nm_fantasia, cin_cp_lotacao
+FROM CIN_cinema
+WHERE cin_cp_lotacao = (SELECT MIN(cin_cp_lotacao) FROM CIN_cinema WHERE cin_cd_cidade = 1)
+AND cin_cd_cidade = 1;
+
+SELECT cin_nm_fantasia, 
+       (cin_dc_logradouro + ', ' + ISNULL(cin_dc_complemento, '') + ', ' + CAST(cin_nu_numero AS VARCHAR) + ', ' + cin_dc_bairro) AS ENDEREÇO, 
+       CID.cid_nm_cidade
+FROM CIN_cinema CIN
+INNER JOIN CID_cidade CID ON CIN.cin_cd_cidade = CID.cid_cd_cidade
+WHERE cin_cp_lotacao > 200
+ORDER BY cin_nm_fantasia ASC;
+
+SELECT cin_nm_fantasia, cin_cp_lotacao
+FROM CIN_cinema
+WHERE cin_cp_lotacao BETWEEN 200 AND 400;
+
+SELECT cin_nm_fantasia, 
+       cin_cp_lotacao, 
+       (cin_cp_lotacao * 2) AS lotacao_x2
+FROM CIN_cinema
+WHERE cin_cd_cidade = 1;
+
+SELECT F.fil_cd_filme, F.fil_tl_original, F.fil_tl_portugues, F.fil_cd_duracao, G.gen_dc_genero
+FROM FIL_filme F
+INNER JOIN GEN_genero G ON F.fil_cd_genero = G.gen_cd_genero
+WHERE F.fil_tl_original LIKE 'A%' 
+  AND F.fil_tl_portugues IS NOT NULL 
+  AND F.fil_cd_genero = 1
+ORDER BY F.fil_tl_original DESC;
+
+SELECT fil_tl_portugues
+FROM FIL_filme
+WHERE fil_tl_portugues LIKE '[C-H]%';
+
+SELECT fil_tl_portugues
+FROM FIL_filme
+WHERE fil_tl_portugues NOT LIKE '[C-H]%';
+
+SELECT fil_tl_portugues
+FROM FIL_filme
+WHERE fil_tl_portugues LIKE '__R%';  -- Usa o símbolo de sublinhado "_" para indicar posição
+
+SELECT A.ato_nm_ator, A.ato_cd_pais_nacionalidade
+FROM ATO_ator A
+UNION
+SELECT AN.ato_nm_ator, AN.ato_cd_pais_nacionalidade
+FROM ATO_ator_novo AN;
+
+SELECT A.ato_nm_ator, A.ato_cd_pais_nacionalidade
+FROM ATO_ator A
+WHERE A.ato_nm_ator NOT IN (SELECT AN.ato_nm_ator FROM ATO_ator_novo AN);
+
+SELECT A.ato_nm_ator, A.ato_cd_pais_nacionalidade
+FROM ATO_ator A
+WHERE A.ato_nm_ator IN (SELECT AN.ato_nm_ator FROM ATO_ator_novo AN);
+
+SELECT P.pai_dc_nacionalidade AS NACIONALIDADE, 
+       A.ato_sx_ator AS SEXO, 
+       COUNT(A.ato_cd_codigo) AS total_atores
+FROM ATO_ator A
+INNER JOIN PAI_pais P ON A.ato_cd_pais_nacionalidade = P.pai_cd_pais
+GROUP BY P.pai_dc_nacionalidade, A.ato_sx_ator
+ORDER BY P.pai_dc_nacionalidade ASC;
+
+SELECT A.ato_nm_ator, A.ato_sx_ator
+FROM ATO_ator A
+WHERE A.ato_nm_ator IN (SELECT AN.ato_nm_ator FROM ATO_ator_novo AN);
+
+SELECT A.ato_nm_ator, A.ato_sx_ator
+FROM ATO_ator A
+WHERE EXISTS (SELECT 1 FROM ATO_ator_novo AN WHERE AN.ato_nm_ator = A.ato_nm_ator);
+
+SELECT A.ato_nm_ator, A.ato_sx_ator
+FROM ATO_ator A
+WHERE A.ato_nm_ator NOT IN (SELECT AN.ato_nm_ator FROM ATO_ator_novo AN);
+
+SELECT A.ato_nm_ator, A.ato_sx_ator
+FROM ATO_ator A
+WHERE NOT EXISTS (SELECT 1 FROM ATO_ator_novo AN WHERE AN.ato_nm_ator = A.ato_nm_ator);
+
+SELECT cin_nm_fantasia, cin_cp_lotacao
+FROM CIN_cinema
+WHERE cin_cp_lotacao < (SELECT AVG(cin_cp_lotacao) FROM CIN_cinema);
+
+
+
+
