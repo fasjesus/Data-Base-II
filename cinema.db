@@ -1,0 +1,233 @@
+-- LISTA 01:
+
+CREATE TABLE PAI_pais(
+	pai_cd_pais INT IDENTITY,
+	pai_nm_pais VARCHAR(50) NOT NULL,
+	pai_dc_nacionalidade VARCHAR(18) NOT NULL,
+	PRIMARY KEY (pai_cd_pais)
+);
+
+CREATE TABLE ATO_ator(
+	ato_cd_codigo INT IDENTITY,
+	ato_nm_ator VARCHAR(50) NOT NULL,
+	ato_sx_ator CHAR(1) DEFAULT 'M',
+	ato_dt_nascimento SMALLDATETIME NOT NULL,
+	ato_rg_ator INT UNIQUE NOT NULL,
+	ato_cd_pais_nacionalidade INT UNIQUE NOT NULL,
+	PRIMARY KEY (ato_cd_codigo),
+	FOREIGN KEY (ato_cd_pais_nacionalidade) REFERENCES PAI_pais ON UPDATE CASCADE,
+	CHECK (ato_sx_ator in ('F', 'M'))
+);
+
+CREATE TABLE TIP_tipo(
+	tip_cd_tipo INT IDENTITY,
+	tip_dc_tipo VARCHAR(50) NOT NULL,
+	PRIMARY KEY (tip_cd_tipo)
+);
+
+CREATE TABLE GEN_genero(
+	gen_cd_genero INT IDENTITY,
+	gen_dc_genero VARCHAR(50) NOT NULL,
+	PRIMARY KEY (gen_cd_genero)
+);
+
+CREATE TABLE FIL_filme(
+	fil_cd_filme INT IDENTITY,
+	fil_tl_original VARCHAR(85) NOT NULL,
+	fil_tl_portugues VARCHAR(85),
+	fil_cd_genero INT NOT NULL, 
+	fil_cd_duracao VARCHAR(20) NOT NULL,
+	fil_dc_importancia VARCHAR(99),
+	fil_dc_impropriedade VARCHAR(20) NOT NULL,
+	fil_cd_pais_origem INT NOT NULL, 
+	fil_cd_diretor INT NOT NULL, 
+	PRIMARY KEY (fil_cd_filme),
+	FOREIGN KEY (fil_cd_genero) REFERENCES GEN_genero ON UPDATE CASCADE,
+	FOREIGN KEY (fil_cd_pais_origem) REFERENCES PAI_pais,
+	FOREIGN KEY (fil_cd_diretor) REFERENCES ATO_ator ON UPDATE CASCADE
+);
+
+CREATE TABLE EST_estado(
+	est_cd_estado INT IDENTITY,
+	est_nm_estado VARCHAR(50) NOT NULL,
+	est_cd_pais INT NOT NULL, 
+	PRIMARY KEY (est_cd_estado),
+	FOREIGN KEY (est_cd_pais) REFERENCES PAI_pais ON UPDATE CASCADE
+);
+
+CREATE TABLE CID_cidade(
+	cid_cd_cidade INT IDENTITY,
+	cid_nm_cidade VARCHAR(50) NOT NULL,
+	cid_cd_estado INT NOT NULL, 
+	PRIMARY KEY (cid_cd_cidade),
+	FOREIGN KEY (cid_cd_estado) REFERENCES EST_estado ON UPDATE CASCADE
+);
+
+CREATE TABLE CIN_cinema(
+	cin_cd_cinema INT IDENTITY,
+	cin_nm_fantasia VARCHAR(50) NOT NULL,
+	cin_dc_logradouro VARCHAR(30) NOT NULL,
+	cin_dc_complemento VARCHAR(20),
+	cin_nu_numero INT,
+	cin_dc_bairro VARCHAR(20) NOT NULL,
+	cin_cd_cidade INT NOT NULL,
+	cin_cp_lotacao INT NOT NULL,
+	PRIMARY KEY (cin_cd_cinema),
+	FOREIGN KEY (cin_cd_cidade) REFERENCES CID_cidade ON UPDATE CASCADE
+);
+
+-- Não foi considerado fci_cd_filme como chave estrangeira.
+
+CREATE TABLE FCI_filme_cinema(
+	fci_cd_filme INT,
+	fci_cd_cinema INT,
+	fci_dt_inicio SMALLDATETIME NOT NULL,
+	fci_dt_fim SMALLDATETIME NOT NULL,
+	PRIMARY KEY (fci_cd_cinema)
+);
+
+DROP TABLE FCI_filme_cinema;
+ALTER TABLE FIL_filme ADD fil_cd_tipo INT;
+ALTER TABLE FIL_filme ADD CONSTRAINT fk_fil_cd_tipo FOREIGN KEY(fil_cd_tipo) REFERENCES TIP_tipo; 
+ALTER TABLE FIL_filme ALTER COLUMN fil_tl_original VARCHAR(100);
+ALTER TABLE FIL_filme DROP COLUMN fil_dc_impropriedade;
+
+CREATE TABLE FCI_filme_cinema(
+	fci_cd_filme INT NOT NULL,
+	fci_cd_cinema INT NOT NULL,
+	fci_dt_inicio SMALLDATETIME NOT NULL,
+	fci_dt_fim SMALLDATETIME NOT NULL
+);
+
+ALTER TABLE FCI_filme_cinema ADD CONSTRAINT pk_fci_cd_filme PRIMARY KEY(fci_cd_filme); 
+ALTER TABLE FCI_filme_cinema DROP CONSTRAINT pk_fci_cd_filme;
+
+ALTER TABLE FCI_filme_cinema ADD CONSTRAINT pk_fci_cd_cinema PRIMARY KEY(fci_cd_cinema); 
+ALTER TABLE FCI_filme_cinema ADD CONSTRAINT fk_fci_cd_filme FOREIGN KEY(fci_cd_filme) REFERENCES FIL_filme;
+
+ALTER TABLE FCI_filme_cinema DROP CONSTRAINT pk_fci_cd_cinema;
+ALTER TABLE FCI_filme_cinema ADD CONSTRAINT fk_fci_cd_cinema FOREIGN KEY(fci_cd_cinema) REFERENCES CIN_cinema;
+
+INSERT INTO PAI_pais (pai_nm_pais, pai_dc_nacionalidade) VALUES 
+('Brasil', 'Brasileiro')
+INSERT INTO PAI_pais (pai_nm_pais, pai_dc_nacionalidade) VALUES 
+('Estados Unidos', 'Americano')
+INSERT INTO PAI_pais (pai_nm_pais, pai_dc_nacionalidade) VALUES 
+('França', 'Francês')
+INSERT INTO PAI_pais (pai_nm_pais, pai_dc_nacionalidade) VALUES 
+('Japão', 'Japonês')
+INSERT INTO PAI_pais (pai_nm_pais, pai_dc_nacionalidade) VALUES 
+('Canadá', 'Canadense');
+
+INSERT INTO EST_estado (est_nm_estado, est_cd_pais) VALUES 
+('Bahia', 1); -- Supondo que 'Brasil' tenha o ID 1
+INSERT INTO EST_estado (est_nm_estado, est_cd_pais) VALUES 
+('Califórnia', 2); -- Supondo que 'Estados Unidos' tenha o ID 2
+INSERT INTO EST_estado (est_nm_estado, est_cd_pais) VALUES 
+('Île-de-France', 3); -- Supondo que 'França' tenha o ID 3
+INSERT INTO EST_estado (est_nm_estado, est_cd_pais) VALUES 
+('Tóquio', 4); -- Supondo que 'Japão' tenha o ID 4
+INSERT INTO EST_estado (est_nm_estado, est_cd_pais) VALUES 
+('Ontário', 5); -- Supondo que 'Canadá' tenha o ID 5
+
+INSERT INTO CID_cidade (cid_nm_cidade, cid_cd_estado) 
+VALUES ('Salvador', 1); -- Supondo que 'Bahia' tenha o ID 1
+INSERT INTO CID_cidade (cid_nm_cidade, cid_cd_estado) 
+VALUES ('Los Angeles', 2); -- Supondo que 'Califórnia' tenha o ID 2
+INSERT INTO CID_cidade (cid_nm_cidade, cid_cd_estado) 
+VALUES ('Paris', 3); -- Supondo que 'Île-de-France' tenha o ID 3
+INSERT INTO CID_cidade (cid_nm_cidade, cid_cd_estado) 
+VALUES ('Shibuya', 4); -- Supondo que 'Tóquio' tenha o ID 4
+INSERT INTO CID_cidade (cid_nm_cidade, cid_cd_estado) 
+VALUES ('Toronto', 5); -- Supondo que 'Ontário' tenha o ID 5
+
+INSERT INTO TIP_tipo (tip_dc_tipo) 
+VALUES ('Ação');
+INSERT INTO TIP_tipo (tip_dc_tipo) 
+VALUES ('Comédia');
+INSERT INTO TIP_tipo (tip_dc_tipo) 
+VALUES ('Drama');
+INSERT INTO TIP_tipo (tip_dc_tipo) 
+VALUES ('Terror');
+INSERT INTO TIP_tipo (tip_dc_tipo) 
+VALUES ('Romance');
+
+INSERT INTO GEN_genero (gen_dc_genero) 
+VALUES ('Masculino');
+INSERT INTO GEN_genero (gen_dc_genero) 
+VALUES ('Feminino');
+INSERT INTO GEN_genero (gen_dc_genero) 
+VALUES ('Não Binário');
+INSERT INTO GEN_genero (gen_dc_genero) 
+VALUES ('Outro');
+INSERT INTO GEN_genero (gen_dc_genero) 
+VALUES ('Prefiro Não Dizer');
+
+
+-- Inserindo atores do sexo masculino
+INSERT INTO ATO_ator (ato_nm_ator, ato_sx_ator, ato_dt_nascimento, ato_rg_ator, ato_cd_pais_nacionalidade)
+VALUES ('João Silva', 'M', '1985-05-02', 123456789, 1); -- Supondo que o Brasil tenha o ID 1
+INSERT INTO ATO_ator (ato_nm_ator, ato_sx_ator, ato_dt_nascimento, ato_rg_ator, ato_cd_pais_nacionalidade)
+VALUES ('Carlos Pereira', 'M', '1990-07-11', 987654321, 2); -- Supondo que os EUA tenham o ID 2
+-- Inserindo atrizes do sexo feminino
+INSERT INTO ATO_ator (ato_nm_ator, ato_sx_ator, ato_dt_nascimento, ato_rg_ator, ato_cd_pais_nacionalidade)
+VALUES ('Ana Souza', 'F', '1992-11-12', 112233445, 3); -- Supondo que a França tenha o ID 3
+INSERT INTO ATO_ator (ato_nm_ator, ato_sx_ator, ato_dt_nascimento, ato_rg_ator, ato_cd_pais_nacionalidade)
+VALUES ('Maria Costa', 'F', '1987-03-10', 556677889, 4); -- Supondo que o Japão tenha o ID 4
+INSERT INTO ATO_ator (ato_nm_ator, ato_sx_ator, ato_dt_nascimento, ato_rg_ator, ato_cd_pais_nacionalidade)
+VALUES ('Juliana Lima', 'F', '1995-09-05', 667788990, 5); -- Supondo que o Canadá tenha o ID 5
+
+UPDATE PAI_pais
+SET pai_nm_pais = 'Japão', pai_dc_nacionalidade = 'Japonês'
+WHERE pai_cd_pais = 1;
+
+DELETE FROM ATO_ator
+WHERE ato_sx_ator = 'M';
+
+SELECT pai_cd_pais, pai_nm_pais
+FROM PAI_pais
+WHERE pai_cd_pais = 1;
+
+SELECT ato_nm_ator, ato_sx_ator, ato_dt_nascimento
+FROM ATO_ator
+WHERE ato_sx_ator = 'F';
+
+SELECT fil_tl_original
+FROM FIL_filme
+WHERE fil_tl_portugues IS NULL
+ORDER BY fil_tl_original;
+
+-- LISTA 02:
+
+CREATE TABLE ATO_ator_novo(
+	ato_cd_codigo INT IDENTITY,
+	ato_nm_ator VARCHAR(50) NOT NULL,
+	ato_sx_ator CHAR(1) DEFAULT 'M',
+	ato_dt_nascimento SMALLDATETIME NOT NULL,
+	ato_rg_ator INT UNIQUE NOT NULL,
+	ato_cd_pais_nacionalidade INT UNIQUE NOT NULL,
+	PRIMARY KEY (ato_cd_codigo),
+	FOREIGN KEY (ato_cd_pais_nacionalidade) REFERENCES PAI_pais ON UPDATE CASCADE,
+	CHECK (ato_sx_ator in ('F', 'M'))
+);
+
+-- Inserindo atores do sexo masculino
+INSERT INTO ATO_ator_novo (ato_nm_ator, ato_sx_ator, ato_dt_nascimento, ato_rg_ator, ato_cd_pais_nacionalidade)
+VALUES ('João Silva', 'M', '1985-05-02', 123456789, 1); -- Supondo que o Brasil tenha o ID 1
+INSERT INTO ATO_ator_novo (ato_nm_ator, ato_sx_ator, ato_dt_nascimento, ato_rg_ator, ato_cd_pais_nacionalidade)
+VALUES ('Carlos Pereira', 'M', '1990-07-11', 987654321, 2); -- Supondo que os EUA tenham o ID 2
+
+-- Inserindo atrizes do sexo feminino
+INSERT INTO ATO_ator_novo (ato_nm_ator, ato_sx_ator, ato_dt_nascimento, ato_rg_ator, ato_cd_pais_nacionalidade)
+VALUES ('Ana Souza', 'F', '1992-11-12', 112233445, 3); -- Supondo que a França tenha o ID 3
+INSERT INTO ATO_ator_novo (ato_nm_ator, ato_sx_ator, ato_dt_nascimento, ato_rg_ator, ato_cd_pais_nacionalidade)
+VALUES ('Maria Costa', 'F', '1987-03-10', 556677889, 4); -- Supondo que o Japão tenha o ID 4
+INSERT INTO ATO_ator_novo (ato_nm_ator, ato_sx_ator, ato_dt_nascimento, ato_rg_ator, ato_cd_pais_nacionalidade)
+VALUES ('Juliana Lima', 'F', '1995-09-05', 667788990, 5); -- Supondo que o Canadá tenha o ID 5
+
+DELETE FROM ATO_ator
+WHERE ato_nm_ator IN (SELECT ato_nm_ator FROM ATO_ator_novo);
+
+SELECT DISTINCT ato_cd_pais_nacionalidade
+FROM ATO_ator;
+
