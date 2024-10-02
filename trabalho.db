@@ -379,11 +379,85 @@ WHERE EXISTS
 (SELECT * FROM Empregado E
 WHERE N.codigoEmpregado = E.codigo);
 
+-- AULA 01/10/2024 ======================================================================================
+
+
 CREATE VIEW Empregado_cargo_funcao AS
 SELECT e.codigoEmpregado, e.nome, e.salario, e.salario*12 AS salario_anual, c.codigo AS cod_cargo, c.nome AS nome_cargo, e.codfuncao AS cod_funcao, f.nome AS nome_funcao
-FROM EmpregadoNovo e inner join Cargo c
+FROM EmpregadoNovo e INNER JOIN cargo c
 ON e.codcargo = c.codigo
 inner join Funcao f
 ON e.codfuncao = f.codigo;
+
+DROP VIEW Empregado_cargo_funcao;
+
+CREATE PROCEDURE EmpregadoNovoProcedure
+AS SELECT e.codigoEmpregado, e.nome, e.salario, e.salario*12 AS salario_anual, c.codigo AS cod_cargo,
+c.nome as nome_cargo, e.codfuncao AS cod_funcao, f.nome AS nome_funcao
+FROM EmpregadoNovo e inner join cargo c
+ON e.codcargo = c.codigo
+inner join Funcao f
+ON e.codfuncao = f.codigo
+ORDER BY e.nome;
+
+
+EXEC EmpregadoNovoProcedure;
+
+-- DROP PROCEDURE EmpregadoNovoProcedure;
+
+-- ALTER PROCEDURE EmpregadoNovoProcedure;
+
+CREATE PROCEDURE spd_InclusaoCargo (
+@codigo int,
+@Nome varchar(20),
+@sing char(1))
+AS
+INSERT INTO cargo (
+codigo,
+nome,
+sing
+)
+VALUES (@codigo, @nome, @sing);
+
+EXEC spd_InclusaoCargo 30, 'GERNTE', 'F';
+
+CREATE PROCEDURE spd_AlteracaoCargo (
+@codigo int,
+@Nome varchar(20),
+@sing char(1))
+AS
+UPDATE cargo 
+SET nome = @nome,
+	sing = @sing
+WHERE codigo = @codigo;
+
+EXEC spd_AlteracaoCargo 30, 'RECEPÇÃO', 'M';
+
+CREATE PROCEDURE spd_ExclusaoCargo 
+@codigo int
+AS
+DELETE cargo 
+WHERE codigo = @codigo;
+
+EXEC spd_ExclusaoCargo 30;
+
+CREATE TABLE CargoNovo(
+	codigo INT IDENTITY,
+	nome VARCHAR(50)
+);
+
+
+CREATE PROCEDURE spd_cargonovo_retorno
+	(@codigo INT OUTPUT,
+	@nome VARCHAR(20))
+AS
+INSERT INTO CargoUm
+	(nome)
+VALUES
+	(@nome)
+SET @codigo = @@IDENTITY
+SELECT @@IDENTITY AS codigo;
+
+
 
 
